@@ -1,5 +1,7 @@
 'use strict';
 
+/*
+
 // Selecting elements
 const player0El = document.querySelector('.player--0');
 const player1El = document.querySelector('.player--1');
@@ -99,3 +101,85 @@ btnNew.addEventListener('click', init); // Make sure not to call the function be
 //   document
 //     .querySelector(`.player--${activePlayer}`)
 //     .classList.add('player--active');
+
+*/
+
+const player0El = document.querySelector('.player--0');
+const player1El = document.querySelector('.player--1');
+const score0El = document.querySelector('#score--0');
+const score1El = document.querySelector('#score--1');
+const current0El = document.querySelector('#current--0');
+const current1El = document.querySelector('#current--1');
+const btnRoll = document.querySelector('.btn--roll');
+const btnHold = document.querySelector('.btn--hold');
+const btnNew = document.querySelector('.btn--new');
+const diceEl = document.querySelector('.dice');
+
+let startingPoint, currentPlayer, scores, playing;
+
+const init = function () {
+  current0El.textContent = 0;
+  current1El.textContent = 0;
+  score0El.textContent = 0;
+  score1El.textContent = 0;
+  player0El.classList.remove('player--winner');
+  player1El.classList.remove('player--winner');
+  player0El.classList.add('player--active');
+  player1El.classList.remove('player--active');
+
+  startingPoint = 0;
+  currentPlayer = 0;
+  scores = [0, 0];
+  playing = true;
+  diceEl.classList.add('hidden');
+};
+
+const switchPlayer = function () {
+  document.querySelector(`#current--${currentPlayer}`).textContent = 0;
+  startingPoint = 0;
+  currentPlayer = currentPlayer === 0 ? 1 : 0;
+  player0El.classList.toggle('player--active');
+  player1El.classList.toggle('player--active');
+};
+
+init();
+
+btnRoll.addEventListener('click', function () {
+  if (playing) {
+    const dice = Math.trunc(Math.random() * 6) + 1;
+    diceEl.classList.remove('hidden');
+    diceEl.src = `dice-${dice}.png`;
+    if (dice !== 1) {
+      startingPoint = dice + startingPoint;
+      document.querySelector(`#current--${currentPlayer}`).textContent =
+        startingPoint;
+    } else {
+      switchPlayer();
+    }
+  }
+});
+
+btnHold.addEventListener('click', function () {
+  if (playing) {
+    scores[currentPlayer] = scores[currentPlayer] + startingPoint;
+    document.querySelector(`#score--${currentPlayer}`).textContent =
+      scores[currentPlayer];
+    startingPoint = 0;
+  }
+  //current0El.textContent = 0;
+
+  if (scores[currentPlayer] >= 20) {
+    playing = false;
+    document
+      .querySelector(`.player--${currentPlayer}`)
+      .classList.remove('player--active');
+    document
+      .querySelector(`.player--${currentPlayer}`)
+      .classList.add('player--winner');
+    diceEl.classList.add('hidden');
+  } else {
+    switchPlayer();
+  }
+});
+
+btnNew.addEventListener('click', init);
